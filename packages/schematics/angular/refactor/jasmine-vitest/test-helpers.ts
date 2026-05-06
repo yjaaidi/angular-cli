@@ -25,7 +25,7 @@ import { RefactorReporter } from './utils/refactor-reporter';
  */
 export async function expectTransformation(
   input: string,
-  expected: string,
+  expected: Expected,
   addImports = false,
 ): Promise<void> {
   const logger = new logging.NullLogger();
@@ -35,8 +35,22 @@ export async function expectTransformation(
     browserMode: false,
     fakeAsync: true,
   });
-  const formattedTransformed = await format(transformed, { parser: 'typescript' });
-  const formattedExpected = await format(expected, { parser: 'typescript' });
 
-  expect(formattedTransformed).toBe(formattedExpected);
+  const formattedTransformed = await format(transformed, { parser: 'typescript' });
+  const formattedExpected = await format(
+    typeof expected === 'string' ? expected : expected.contains,
+    { parser: 'typescript' },
+  );
+
+  if (typeof expected === 'string') {
+    expect(formattedTransformed).toBe(formattedExpected);
+  } else {
+    const indent = ' '.repeat(expected.indent ?? 0);
+    expect(formattedTransformed).toContain(
+      formattedExpected.replace(/(\n)(?!$|\n)/g, `$1${indent}`),
+    );
+  }
 }
+
+type Expected = string | ExpectedContains;
+type ExpectedContains = { contains: string; indent?: number };

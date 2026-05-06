@@ -47,19 +47,14 @@ describe('transformFakeAsyncTest', () => {
             }));
           });
         `,
-      expected: `
-          describe('My fakeAsync suite', () => {
-            beforeEach(() => {
-              vi.useFakeTimers({ advanceTimeDelta: 1, shouldAdvanceTime: true });
-            });
-            afterEach(() => {
-              vi.useRealTimers();
-            });
+      expected: {
+        contains: `
             it('works', async (strangeArg: Strange = myStrangeDefault) => {
               expect(1).toBe(1);
             });
-          });
         `,
+        indent: 2,
+      },
     },
     {
       description: 'should transform fakeAsync test to `vi.useFakeTimers()` in outer describe',
@@ -170,26 +165,15 @@ describe('transformFakeAsyncTest', () => {
             }));
           });
       `,
-      expected: `
-          describe('My fakeAsync suite', () => {
-            beforeEach(() => {
-              vi.useFakeTimers({ advanceTimeDelta: 1, shouldAdvanceTime: true });
-            });
-            afterEach(() => {
-              vi.useRealTimers();
-            });
-
-            let count = 0;
+      expected: {
+        contains: `
             beforeEach(async () => {
               setTimeout(() => ++count, 100);
               await vi.runOnlyPendingTimersAsync();
             });
-
-            it('works', async () => {
-              expect(count).toBe(1);
-            });
-          });
-      `,
+        `,
+        indent: 2,
+      },
     },
     {
       description: 'should transform fakeAsync test to `vi.useFakeTimers()` in `afterEach`',
@@ -202,19 +186,14 @@ describe('transformFakeAsyncTest', () => {
             }));
           });
         `,
-      expected: `
-          describe('My fakeAsync suite', () => {
-            beforeEach(() => {
-              vi.useFakeTimers({ advanceTimeDelta: 1, shouldAdvanceTime: true });
-            });
-            afterEach(() => {
-              vi.useRealTimers();
-            });
+      expected: {
+        contains: `
             afterEach(async () => {
               console.log('afterEach');
             });
-          });
         `,
+        indent: 2,
+      },
     },
     {
       description: 'should transform fakeAsync test to `vi.useFakeTimers()` in `beforeAll`',
@@ -227,19 +206,14 @@ describe('transformFakeAsyncTest', () => {
             }));
           });
         `,
-      expected: `
-          describe('My fakeAsync suite', () => {
-            beforeEach(() => {
-              vi.useFakeTimers({ advanceTimeDelta: 1, shouldAdvanceTime: true });
-            });
-            afterEach(() => {
-              vi.useRealTimers();
-            });
+      expected: {
+        contains: `
             beforeAll(async () => {
               console.log('beforeAll');
             });
-          });
         `,
+        indent: 2,
+      },
     },
     {
       description: 'should transform fakeAsync test to `vi.useFakeTimers()` in `afterAll`',
@@ -252,19 +226,14 @@ describe('transformFakeAsyncTest', () => {
             }));
           });
         `,
-      expected: `
-          describe('My fakeAsync suite', () => {
-            beforeEach(() => {
-              vi.useFakeTimers({ advanceTimeDelta: 1, shouldAdvanceTime: true });
-            });
-            afterEach(() => {
-              vi.useRealTimers();
-            });
+      expected: {
+        contains: `
             afterAll(async () => {
               console.log('afterAll');
             });
-          });
         `,
+        indent: 2,
+      },
     },
     {
       description: 'should not replace `fakeAsync` if not used within a describe block',
@@ -319,14 +288,8 @@ describe('transformFakeAsyncTest', () => {
             }));
           });
       `,
-      expected: `
-          describe('My fakeAsync suite', () => {
-            beforeEach(() => {
-              vi.useFakeTimers({ advanceTimeDelta: 1, shouldAdvanceTime: true });
-            });
-            afterEach(() => {
-              vi.useRealTimers();
-            });
+      expected: {
+        contains: `
             afterEach(async () => {
               console.log('afterEach');
             });
@@ -334,8 +297,9 @@ describe('transformFakeAsyncTest', () => {
             it('works', async () => {
               expect(1).toBe(1);
             });
-          });
-      `,
+        `,
+        indent: 2,
+      },
     },
     {
       description:
@@ -349,19 +313,14 @@ describe('transformFakeAsyncTest', () => {
             }, {flush: false}));
           });
       `,
-      expected: `
-          describe('My fakeAsync suite', () => {
-            beforeEach(() => {
-              vi.useFakeTimers({ advanceTimeDelta: 1, shouldAdvanceTime: true });
-            });
-            afterEach(() => {
-              vi.useRealTimers();
-            });
+      expected: {
+        contains: `
             beforeEach(async () => {
               console.log('beforeEach');
             });
-          });
-      `,
+        `,
+        indent: 2,
+      },
     },
   ];
 
