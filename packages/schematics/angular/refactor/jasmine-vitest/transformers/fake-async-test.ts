@@ -207,8 +207,9 @@ function _isFakeAsyncFlushDisabled(fakeAsyncCallExpression: ts.CallExpression): 
     options.properties.some(
       (property) =>
         ts.isPropertyAssignment(property) &&
-        property.name.getText() === 'flush' &&
-        property.initializer.getText() === 'false',
+        ts.isIdentifier(property.name) &&
+        property.name.text === 'flush' &&
+        property.initializer.kind === ts.SyntaxKind.FalseKeyword,
     )
   );
 }
